@@ -1,9 +1,8 @@
-package med.voll.api.medico;
+package med.voll.api.domain.paciente;
+
 
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -12,43 +11,38 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import med.voll.api.endereco.Endereco;
+import med.voll.api.domain.endereco.Endereco;
 
-@Table(name = "medicos")
-@Entity(name = "Medico")
 @Getter
+@EqualsAndHashCode(of = "id")
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(of = "id")
-public class Medico {
-
+@Entity(name = "Paciente")
+@Table(name = "pacientes")
+public class Paciente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nome;
     private String email;
+    private String cpf;
     private String telefone;
-    private String crm;
-
-    @Enumerated(EnumType.STRING)
-    private Especialidade especialidade;
 
     @Embedded
     private Endereco endereco;
 
     private Boolean ativo;
 
-    public Medico(DadosCadastroMedico dados) {
+    public Paciente(DadosCadastroPaciente dados) {
         this.ativo = true;
         this.nome = dados.nome();
         this.email = dados.email();
         this.telefone = dados.telefone();
-        this.crm = dados.crm();
-        this.especialidade = dados.especialidade();
+        this.cpf = dados.cpf();
         this.endereco = new Endereco(dados.endereco());
     }
 
-    public void upDateInformacoesMedico(DadosUpDateMedico dados) {
+    public void upDateInformacoesPaciente(DadosUpDatePaciente dados) {
         if (dados.nome() != null) {
             this.nome = dados.nome();
         }
@@ -56,11 +50,15 @@ public class Medico {
             this.telefone = dados.telefone();
         }
         if (dados.endereco() != null) {
-            this.endereco.upDateInformacoesMedico(dados.endereco());
+            this.endereco.upDateInformacoesPaciente(dados.endereco());
         }
     }
 
     public void excluir() {
         this.ativo = false;
+    }
+
+    public void recuperar() {
+        this.ativo = true;
     }
 }
