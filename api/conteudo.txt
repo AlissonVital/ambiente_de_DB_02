@@ -1,0 +1,38 @@
+-ResponseEntity = resposta que é dada no sistema com códigos [200 Ok, 204 processado com sucesso porém não tem conteúdo, e etc...]
+-ResponseEntity. = tras da classe varios metodos com seus devidos códigos.
+-Para instancias - return ResponseEntity.metododesejado
+-O ResponseEntity é colocado no lugar do void.
+
+-É utilizado para exclusão:
+    .noContent() - trás o código 204, cria um objeto que não devolve o ResponseEntity
+    Em seguida .build(); - construir um objeto no ResponseEntity
+        Logo o código fica assim:
+        return ResponseEntity.noContent().build();
+
+-É utilizado para Listar:
+    .ok() - tras o código 200, devolve no corpo da resposta os dados do novo recurso/registro criado e um cabeçalho do protocolo HTTP (Location).
+    .ok(page);
+        Logo o código fica assim:
+        return ResponseEntity.ok(page);
+
+-É utilizado para Atualizar:
+-Para atualizar, é importante devolver as informações(id, nome, email, etc) que foram atuaizadas,
+ Logo deve colocar uma entidade no parametro com todas as informações do médico ou conforme regra de negócio.
+ Caso nenhum dto atenda as atualizações, é necessario criar um dto com todas informaçoes junto com um construtor
+ na classe. return ResponseEntity.ok(new NomeDoDto(nome da entidade));
+        Logo o código fica assim:
+                return ResponseEntity.ok(new DadosDetalhamentoMedico(medico));
+
+-É utilizado para Cadastrar: código 201, Requisição processada e novo recurso criado
+ Porém, esse código 201 possui algumas regras. Na resposta, devemos colocar o código 201 e no corpo da resposta os
+ dados do novo registro criado e, também, um cabeçalho do protocolo HTTP.
+ Esse cabeçalho mostra o endereço para que o front-end, ou aplicativo mobile consiga acessar o recurso cadastrado.
+ Logo, no cadastro não devolvemos apenas o código 200 OK e nem apenas o 201.
+ Precisa ser o código 201, com os dados no formato JSON e um cabeçalho, na resposta. Para fazer isso, usaremos
+ alguns recursos do Spring Boot.
+ No método de cadastrar do arquivo MedicoController, note que ele já aponta um erro de compilação, já que alteramos
+ o retorno de void para ResponseEntity.
+ Após chamarmos o repository.save, como fazemos para acionar o código 201? Incluiremos return ResponseEntity com o
+ método .created(), que passaremos como parâmetro a uri: return ResponseEntity.created(uri).
+ Essa uri representa o endereço, e o Spring cria o cabeçalho location de forma automática conforme a uri que
+ passamos como parâmetro. Ainda vamos criar essa URI.
