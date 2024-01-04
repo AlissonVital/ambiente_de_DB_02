@@ -50,7 +50,7 @@ public class Paciente {
             this.telefone = dados.telefone();
         }
         if (dados.endereco() != null) {
-            this.endereco = new Endereco(dados.endereco());
+            this.endereco.upDateInformacoesPaciente(dados.endereco());
         }
     }
 
