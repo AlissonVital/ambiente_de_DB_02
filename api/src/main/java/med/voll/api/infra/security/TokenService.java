@@ -3,6 +3,8 @@ package med.voll.api.infra.security;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import lombok.extern.slf4j.Slf4j;
 import med.voll.api.domain.usuario.Usuario;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -12,21 +14,38 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
 @Service
+@Slf4j
 public class TokenService {
 
     @Value("${api.security.token.secret}")
     private String secret;
+
     public String gerarToken(Usuario usuario) {
         try {
-            var algoritimo = Algorithm.HMAC256(secret);
+            var algoritmo = Algorithm.HMAC256(secret);
             return JWT.create()
                     .withIssuer("API Voll.med")
-                    .withSubject(usuario.getLogin())// - recebe o usuario como paramentro
+                    .withSubject(usuario.getLogin())
                     .withExpiresAt(dataExpiracao())
-                    .sign(algoritimo);
+                    .sign(algoritmo);
         } catch (JWTCreationException exception){
-            throw new RuntimeException("erro ao gerar token jwt (throw new)", exception);
+            log.error("Deu ruim");
         }
+        return null;
+    }
+
+    public String getSubject(String tokenJWT) {
+        try {
+            var algoritmo = Algorithm.HMAC256(secret);
+            return JWT.require(algoritmo)
+                    .withIssuer("API Voll.med")
+                    .build()
+                    .verify(tokenJWT)
+                    .getSubject();
+        } catch (JWTVerificationException exception) {
+            log.error("Deu ruim");
+        }
+        return tokenJWT;
     }
 
     private Instant dataExpiracao() {
